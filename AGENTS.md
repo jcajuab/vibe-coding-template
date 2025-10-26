@@ -4,9 +4,7 @@ Authoritative checklist for anyone using autonomous or semi-autonomous agents in
 
 ## Canonical Context
 
-- Read every file in `docs/` (`FILE_STRUCTURE.md`, `BEST_PRACTICES.md`, and future additions) before writing code, and reread after those files change.
-- Architecture, naming, and folder rules live in `docs/FILE_STRUCTURE.md`; follow them unless that file calls out an exception.
-- Follow the icon, component, and token guidance in `docs/BEST_PRACTICES.md` so UI decisions stay consistent.
+- Read every file in `docs/` (`FILE_STRUCTURE.md` for architecture rules, `BEST_PRACTICES.md` for UI/data flow, plus future additions) before writing code, and reread after those files change.
 
 ## Tooling and Process
 
@@ -24,16 +22,13 @@ Authoritative checklist for anyone using autonomous or semi-autonomous agents in
 
 ## Development Conventions
 
-- Defer to `docs/FILE_STRUCTURE.md` for structure, naming, component placement, and schema expectations; reread it whenever those rules change.
-- Use `docs/BEST_PRACTICES.md` for routing, server-action, and feature rollout guidance, and keep it current when those conventions evolve.
-- Escalate proposed deviations by updating the relevant doc first so downstream contributors stay aligned.
+- Escalate proposed deviations by updating the relevant doc in `docs/` first so downstream contributors stay aligned.
 
 ## Workflow Rules for Agents
 
 - Reconfirm the latest instructions in this guide and in `docs/` before modifying files.
 - Update the relevant documentation in `docs/` whenever structure, conventions, or workflows change.
 - Do not revert user-authored changes unless explicitly instructed.
-- Follow `docs/BEST_PRACTICES.md` for icons, shadcn/ui primitives, and Tailwind token usage instead of local improvisations.
 - If a command fails due to sandboxing or approval limits, capture the attempt and coordinate instead of retrying blindly.
 
 ## Commit and Collaboration
