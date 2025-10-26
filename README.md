@@ -1,5 +1,9 @@
 # Vibe Coding Template
 
+## Prerequisites
+
+Before running any automation against this repo, ensure your Agentic AI can read and comply with `AGENTS.md` and already has the Context7, Next Devtools, and ShadCN MCP servers configured.
+
 ## Next Steps
 
 - [ ] Create `docs/DESIGN.md` with design tokens, layout references, and inspiration assets so future features share the same visual language.
