@@ -1,0 +1,28 @@
+{
+  "code_actions_on_format": {
+    "source.fixAll.biome": true,
+    "source.organizeImports.biome": true
+  },
+  "formatter": {
+    "language_server": {
+      "name": "biome"
+    }
+  },
+  "languages": {
+    "CSS": {
+      "language_servers": ["tailwindcss"]
+    }
+  },
+  "lsp": {
+    "vtsls": {
+      "settings": {
+        "typescript": {
+          "preferences": {
+            "autoImportFileExcludePatterns": ["lucide-react"],
+            "importModuleSpecifier": "non-relative"
+          }
+        }
+      }
+    }
+  }
+}

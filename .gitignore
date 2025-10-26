@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Build Output
+build/
+out/
+.next/
+
+# Environment Variables
+.env*
+!.env.example
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Platform
+.vercel/
+
+# Miscellaneous
+.DS_Store
+Thumbs.db
