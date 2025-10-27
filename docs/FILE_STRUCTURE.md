@@ -1,25 +1,32 @@
 # FILE_STRUCTURE.md
 
-This project is built with the Next.js App Router, shadcn/ui primitives, and Zod validation. **Colocation is non-negotiable**: keep features inside the route segment that owns them, promote code only after multiple routes need it, and rely on clear naming so the tree stays predictable.
+## Purpose & Scope
 
-## Guiding Principles
+This guide defines the canonical filesystem layout for the Next.js App Router stack in this repo. It enforces strict colocation so every route segment owns its UI, data orchestration, and validation until multiple segments need promotion. Treat these rules as the baseline that `docs/BEST_PRACTICES.md` builds upon.
 
-- **Route-first organization**: Every feature lives inside its route segment under `app/`. Keep UI, data orchestration, and validation next to the page that uses them.
-- **Shared vs feature scope**: Promote code to a shared directory (`components/ui`, `lib`, `hooks`) only after more than one feature needs it. Otherwise, keep it inside the route folder.
-- **Consistent naming**: Use kebab-case for every file name (for example `login-form.tsx`, `submit-login.action.ts`, `list-users.query.ts`). Export React components in PascalCase, but keep filenames kebab-case.
+## How to Use This Guide
 
-Consult `docs/BEST_PRACTICES.md` for guidance on client vs. server boundaries, Zod workflows, and shadcn/ui usage that build on this structural baseline.
+- Read this file whenever you scaffold a new segment or reorganize feature code.
+- Cross-check `docs/BEST_PRACTICES.md` after each section—the two documents share the same outline so you can move between structure and workflow guidance line by line.
+- Update both docs together if you change folder conventions or introduce new shared directories.
 
-## Workspace Overview
+## Core Principles
 
-- `package.json` · npm scripts and dependencies
-- `components.json` · registry for shadcn/ui components
-- `tsconfig.json` · path aliases (`@/*` → `src/*`)
-- `public/` · static assets served by Next.js
-- `docs/` · project documentation (this file lives here)
-- `src/` · application code (details below)
+- **Route-first organization**: every feature lives inside its owning segment under `app/`.
+- **Colocation before promotion**: keep logic, schemas, and UI in the feature until more than one route requires them.
+- **Predictable naming**: use kebab-case filenames (`login-form.tsx`, `submit-login.action.ts`) and export React components in PascalCase.
+- **Shallow shared surface**: only `components/ui`, `hooks`, and `lib` host code that multiple features actively consume.
 
-## `src/` Directory Map
+## Implementation Playbook
+
+### Workspace Layout
+
+- `package.json` · scripts and dependency manifest.
+- `components.json` · shadcn/ui registry.
+- `tsconfig.json` · path aliases (`@/*` → `src/*`).
+- `public/` · static assets.
+- `docs/` · project documentation (this file lives here).
+- `src/` · application code (detailed below).
 
 ```text
 src
@@ -51,32 +58,31 @@ src
 └─ lib/                     # Framework-agnostic helpers & shared schemas
 ```
 
-## Common Feature Subfolders (`app/**/feature/*`)
+### Feature Module Anatomy (`app/**/feature/*`)
 
-- `_components/` · Client-only leaves (forms, buttons, charts) or small server components unique to the feature. Wrap shadcn/ui primitives here instead of editing upstream files.
-- `_actions/` · Server actions for mutations. Name files with the `*.action.ts` suffix (for example `submit-login.action.ts`). Validate inputs with nearby Zod schemas before calling downstream services.
-- `_queries/` · Server-only data loaders and helpers used by `page.tsx` or server actions. Name files with the `*.query.ts` suffix (for example `list-users.query.ts`) and include `import "server-only";` as the first statement to guarantee they never ship client-side.
-- `_hooks/` · Feature-scoped React hooks. Keep them local unless reused elsewhere.
-- `_schemas/` · Zod schemas, inferred types, and type-safe helpers for parsing inputs/outputs. Re-export types from here for components and server actions.
-- Optional additions when the feature grows:
-  - `_constants/` · Static configuration shared across the feature.
-  - `_tests/` · Integration tests colocated with the feature when practical.
-  - `loading.tsx`, `error.tsx` · Route-specific loading and error boundaries.
+- `_components/` · client leaves (forms, charts) or small server components unique to the feature. Wrap shadcn/ui primitives here instead of editing upstream files.
+- `_actions/` · server actions for mutations. Name files with the `*.action.ts` suffix and validate inputs with colocated Zod schemas before invoking downstream services.
+- `_queries/` · server-only data loaders consumed by `page.tsx` or server actions. Name files with the `*.query.ts` suffix and include `import "server-only";` as the first statement.
+- `_hooks/` · feature-scoped React hooks. Promote to `hooks/` only when multiple segments share them.
+- `_schemas/` · Zod schemas, inferred types, and helper utilities. Re-export types for UI and server actions.
 
-## `components/ui`: Shared Design System
+### Shared Directories
 
-- Generated via `pnpm dlx shadcn@latest add …`. Leave these primitives close to the upstream implementation.
-- Create lightweight wrappers (for example `app/(protected)/dashboard/_components/data-card.tsx`) to bind domain-specific props instead of modifying the base components.
+- `components/ui` · shadcn/ui primitives generated via `pnpm dlx shadcn@latest add …`. Extend them with lightweight wrappers inside feature folders rather than editing the base components.
+- `hooks/` · cross-feature React hooks (`use-mobile.ts`, etc.).
+- `lib/` · framework-agnostic helpers, shared schemas, and API clients consumed by multiple features.
 
-## `hooks`: Cross-Feature Utilities
+### Optional Feature Additions
 
-- Holds hooks used in multiple routes (for example `use-mobile.ts`).
-- Feature-specific hooks should stay in the feature’s `_hooks/` directory.
+- `_constants/` · static configuration shared across the feature.
+- `_tests/` · colocated integration tests when the feature benefits from proximity.
+- `loading.tsx` / `error.tsx` · route-specific boundaries for suspense and error handling.
 
-## `lib`: Reusable Logic & Validation
+## Quick Checklists
 
-- General-purpose helpers (`utils.ts`, formatting utilities, URL builders) that do not depend on React specifics.
-- Shared Zod schemas or schema factories. Use folders such as `lib/validators/` or `lib/server/` as the codebase grows.
-- API clients or fetch wrappers that are consumed by multiple server actions.
+- **Scaffold a new route**: choose the correct route group, start with a server `page.tsx`, add `layout.tsx` only when the segment needs unique chrome, and create `_schemas/` before building actions or UI.
+- **Promote code to shared**: confirm at least two routes depend on it, move reusable pieces to `components/ui`, `hooks`, or `lib`, and update imports across consumers in the same change set.
 
-Refer to `docs/BEST_PRACTICES.md` for routing conventions, server-action guidance, and feature rollout practices that complement this structure overview.
+## Keep This Doc Current
+
+Revise this file alongside `docs/BEST_PRACTICES.md` whenever you change directory conventions, introduce new shared surfaces, or adjust feature scaffolding steps so both guides remain synchronized.
