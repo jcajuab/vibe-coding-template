@@ -36,8 +36,17 @@ This guide captures the day-to-day decisions that make the filesystem in `docs/F
 ### Server Actions & Data Flow
 
 - Treat server actions as the mutation boundary: validate inputs with colocated Zod schemas, call shared helpers, and return typed responses for the UI.
-- After mutations, trigger the right invalidation primitive (`revalidatePath`, `revalidateTag`, or `cacheLife`/`cacheTag`) so downstream server components see fresh data.
+- After mutations, trigger the appropriate invalidation primitive (for example `revalidatePath` or `revalidateTag`) so downstream server components see fresh data.
 - Pair queries with the components that consume them, document caching behavior in the file header, and keep responses serializable for server components and actions alike.
+- Even when a feature starts with mock data, structure `_queries/` and `_actions/` as if they already talk to durable storage: keep asynchronous signatures, surface domain-specific errors, and isolate persistence concerns behind server-only helpers so swapping in a real database is mostly configuration.
+
+### Data Access Layer
+
+- Keep feature-specific persistence logic colocated in `_queries/` and `_actions/`, but extract shared adapters (ORM clients, API SDK wrappers, transactional helpers) into `src/server/**` modules marked with `import "server-only";` so they never ship to the client bundle.
+- Expose repository-style functions from `src/server` that model the domain (e.g., `getUserById`, `createInvoice`) and keep them asynchronous even when they wrap mock data. This preserves type contracts and makes the transition to a real database or edge store a swap of implementation details, not signatures.
+- Centralize connection management (pool re-use, retries, tracing hooks) inside `src/server` and inject any per-request context from server actions, keeping React components free of driver concerns.
+- Document data lifecycle assumptions (idempotency, caching tags, invalidation triggers) at the repository level so server actions can call the correct invalidation helper after mutations.
+- Drive the contract from Zod schemas: parse inputs with `schema.parse` (or `safeParse`) and export `z.infer<typeof schema>` types for the rest of the stack so mock data and real persistence share identical shapes without refactors.
 
 ### Zod Usage
 
@@ -59,7 +68,7 @@ export type LoginSchema = z.infer<typeof loginSchema>;
 ### Feature Rollout Sequence
 
 1. Decide whether the feature belongs in `(public)` or `(protected)` and update navigation metadata accordingly.
-2. Start with a server `page.tsx`; add a colocated `layout.tsx` only when the segment needs unique chrome or data providers.
+2. Start with a server `page.tsx`; add a colocated `layout.tsx` only when the segment needs unique chrome or data providers. Treat `params` and `searchParams` as Promises (Next.js 15+); always `await` them before use.
 3. Define the data contract early: create or update `_schemas/` with Zod objects, then reuse those types in forms, queries, and server actions.
 4. Implement mutations and loaders next—co-locate `_actions/` and `_queries/`, document caching expectations, and wire invalidation before building UI.
 5. Compose UI with shadcn/ui primitives inside `_components/`, leaning on tokens from `app/globals.css` so styling stays consistent.
@@ -69,6 +78,8 @@ export type LoginSchema = z.infer<typeof loginSchema>;
 
 - Modularize components regardless of scope. Favor small, single-purpose files instead of exporting multiple components from one module.
 - Break up large components when interactions can be scoped, and colocate the resulting pieces near the feature that owns them so context stays obvious.
+- Define component props with `interface` declarations (not `type` aliases) to keep naming consistent and make extension via declaration merging possible when needed.
+- Follow consistent naming in Next.js file-based exports: root layouts export `RootLayout` with matching `RootLayoutProps`, pages export `<SegmentName>Page` (e.g., `home/page.tsx` → `HomePage` with `HomePageProps`), and other components mirror their filename (`login-form.tsx` → `LoginForm` / `LoginFormProps`). Avoid inline prop typing—declare the interface above the component and reuse it for server actions or hooks when necessary.
 
 ## Quick Checklists
 

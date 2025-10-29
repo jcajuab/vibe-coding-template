@@ -17,12 +17,14 @@ Authoritative checklist for anyone using autonomous or semi-autonomous agents in
 
 1. Run `pnpm install` only when dependencies change.
 2. Run `pnpm check` as the primary static analysis gate.
-3. Run `pnpm build` after `pnpm check` succeeds to validate the production bundle.
-4. Report all command outcomes, including failures.
+3. Run `pnpm test` (or the targeted suite documented in the change request) whenever the work can affect runtime behavior.
+4. Run `pnpm build` after quality gates succeed to validate the production bundle.
+5. Report all command outcomes, including failures.
 
 ## Development Conventions
 
 - Escalate proposed deviations by updating the relevant doc in `docs/` first so downstream contributors stay aligned.
+- Confirm whether `experimental.cacheComponents` is enabled before adopting `'use cache'` APIs; if the flag is off, document the decision and avoid introducing cache-specific directives.
 
 ## Workflow Rules for Agents
 

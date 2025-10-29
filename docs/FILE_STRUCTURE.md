@@ -15,7 +15,7 @@ This guide defines the canonical filesystem layout for the Next.js App Router st
 - **Route-first organization**: every feature lives inside its owning segment under `app/`.
 - **Colocation before promotion**: keep logic, schemas, and UI in the feature until more than one route requires them.
 - **Predictable naming**: use kebab-case filenames (`login-form.tsx`, `submit-login.action.ts`) and export React components in PascalCase.
-- **Shallow shared surface**: only `components/ui`, `hooks`, and `lib` host code that multiple features actively consume.
+- **Shallow shared surface**: only `components/ui`, `hooks`, `lib`, and `server` host code that multiple features actively consume.
 
 ## Implementation Playbook
 
@@ -27,10 +27,15 @@ This guide defines the canonical filesystem layout for the Next.js App Router st
 - `public/` · static assets.
 - `docs/` · project documentation (this file lives here).
 - `src/` · application code (detailed below).
+- `proxy.ts` (optional) · edge proxy that replaces legacy `middleware.ts` for request rewriting and header mutation.
+- `instrumentation.ts` (optional) · server start hooks for tracing and monitoring setup.
 
 ```text
 src
 ├─ app/                     # Next.js App Router entry point
+│  ├─ api/                  # Route handlers (request-time only)
+│  │  └─ users/
+│  │     └─ route.ts
 │  ├─ (public)/             # Routes that do not require auth
 │  │  └─ auth/
 │  │     └─ login/
@@ -55,7 +60,8 @@ src
 ├─ components/
 │  └─ ui/                   # shadcn/ui primitives and shared wrappers
 ├─ hooks/                   # Cross-feature React hooks (client)
-└─ lib/                     # Framework-agnostic helpers & shared schemas
+├─ lib/                     # Framework-agnostic, client-safe helpers & shared schemas
+└─ server/                  # Shared server-only modules (repositories, adapters)
 ```
 
 ### Feature Module Anatomy (`app/**/feature/*`)
@@ -66,11 +72,19 @@ src
 - `_hooks/` · feature-scoped React hooks. Promote to `hooks/` only when multiple segments share them.
 - `_schemas/` · Zod schemas, inferred types, and helper utilities. Re-export types for UI and server actions.
 
+### Route Handlers (`app/api/**/route.ts`)
+
+- Keep all HTTP handlers under `app/api`, one folder per resource. Co-locate supporting tests or fixtures next to the handler when they only apply to that route.
+- Use file-based conventions (`route.ts`) and export HTTP verb functions (`GET`, `POST`, etc.) only; share business logic through `src/server` repositories instead of reaching into feature `_queries/` directories.
+- Remember route handlers execute in the HTTP handler layer—keep them stateless, avoid long-lived caches, and delegate cache invalidation logic to the server repositories they call.
+- Reuse typed request parsing helpers from `src/server` and keep handlers thin, delegating validation to shared schemas housed in `_schemas/` or promoted to `src/server` as needed.
+
 ### Shared Directories
 
 - `components/ui` · shadcn/ui primitives generated via `pnpm dlx shadcn@latest add …`. Extend them with lightweight wrappers inside feature folders rather than editing the base components.
 - `hooks/` · cross-feature React hooks (`use-mobile.ts`, etc.).
-- `lib/` · framework-agnostic helpers, shared schemas, and API clients consumed by multiple features.
+- `lib/` · framework-agnostic helpers, shared schemas, and API clients that are safe to import from client components.
+- `server/` · shared server-only modules (database repositories, external service adapters). Require `import "server-only";` at the top of entry points.
 
 ### Optional Feature Additions
 
@@ -81,7 +95,7 @@ src
 ## Quick Checklists
 
 - **Scaffold a new route**: choose the correct route group, start with a server `page.tsx`, add `layout.tsx` only when the segment needs unique chrome, and create `_schemas/` before building actions or UI.
-- **Promote code to shared**: confirm at least two routes depend on it, move reusable pieces to `components/ui`, `hooks`, or `lib`, and update imports across consumers in the same change set.
+- **Promote code to shared**: confirm at least two routes depend on it, move reusable pieces to `components/ui`, `hooks`, `lib`, or `server`, and update imports across consumers in the same change set.
 
 ## Keep This Doc Current
 
