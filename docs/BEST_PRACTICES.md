@@ -25,6 +25,7 @@ This guide captures the day-to-day decisions that make the filesystem in `docs/F
 - Use nested `layout.tsx` files for shared chrome or data dependencies, especially when multiple child routes need the same providers or loaders.
 - Place `loading.tsx` and `error.tsx` next to the owning `page.tsx` whenever you need custom suspense or route-level error boundaries.
 - Organize the filesystem with route groups such as `(marketing)` or `(public)` without changing URLs.
+- For authenticated shells such as `(protected)/dashboard`, compose the layout from `_components` client wrappers (for example, `DashboardShell`) that mount the shadcn `Sidebar` with an inset variant, fake navigation data, and footer affordances so individual pages stay focused on feature content.
 
 ### Component Strategy
 

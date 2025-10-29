@@ -66,7 +66,7 @@ src
 
 ### Feature Module Anatomy (`app/**/feature/*`)
 
-- `_components/` · client leaves (forms, charts) or small server components unique to the feature. Wrap shadcn/ui primitives here instead of editing upstream files.
+- `_components/` · client leaves (forms, charts) or small server components unique to the feature. Wrap shadcn/ui primitives here instead of editing upstream files and host route-level shells like `DashboardShell` or `DashboardSidebar` so layouts stay thin.
 - `_actions/` · server actions for mutations. Name files with the `*.action.ts` suffix and validate inputs with colocated Zod schemas before invoking downstream services.
 - `_queries/` · server-only data loaders consumed by `page.tsx` or server actions. Name files with the `*.query.ts` suffix and include `import "server-only";` as the first statement.
 - `_hooks/` · feature-scoped React hooks. Promote to `hooks/` only when multiple segments share them.

@@ -9,9 +9,7 @@ Authoritative checklist for anyone using autonomous or semi-autonomous agents in
 ## Tooling and Process
 
 - Use `pnpm` only so `pnpm-lock.yaml` stays authoritative; do not run `npm` or `yarn`.
-- Use Context7 MCP for documentation lookup and Next Devtools MCP for runtime inspection before consulting any other source; prefer the Next Devtools MCP docs lookup for Next.js references.
 - Biome handles linting and formatting whenever the scope requires those checks.
-- When adding or evaluating frontend components, use the shadcn MCP tools (`list_items_in_registries`, `search_items_in_registries`) first; if a component is missing, add it with `pnpm dlx shadcn@latest add <component>` and prefer shadcn components for consistency.
 
 ## Required Commands for Each Change Set
 

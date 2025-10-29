@@ -6,10 +6,10 @@ This document captures the design system expectations for the repository. Treat 
 
 ## Theme Tokens & Centralized Styles
 
-- All visual tokens live in `src/styles/theme.css`. Update this file first whenever you need to adjust colors, radii, or component chrome.
+- All visual tokens live in `src/styles/globals.css`. Update this file first whenever you need to adjust colors, radii, or component chrome.
 - Light and dark palettes use OKLCH values for perceptual consistency. Modify both scopes together to keep contrast ratios aligned.
 
-### Light Theme (`:root` in `src/styles/theme.css`)
+### Light Theme (`:root` in `src/styles/globals.css`)
 
 | Token                                    | Value                                   | Usage                                           |
 | ---------------------------------------- | --------------------------------------- | ----------------------------------------------- |
@@ -27,7 +27,7 @@ This document captures the design system expectations for the repository. Treat 
 | `--chart-1..5`                           | See file                                | Data visualizations.                            |
 | `--sidebar*` tokens                      | `oklch(...)`                            | Vertical navigation background, text, emphasis. |
 
-### Dark Theme (`.dark` scope in `src/styles/theme.css`)
+### Dark Theme (`.dark` scope in `src/styles/globals.css`)
 
 | Token                                    | Value                                      | Usage                                           |
 | ---------------------------------------- | ------------------------------------------ | ----------------------------------------------- |
@@ -81,7 +81,7 @@ This document captures the design system expectations for the repository. Treat 
 
 ## Process Checklist
 
-1. Update `src/styles/theme.css` when changing tokens; apply matching updates to both light and dark scopes.
+1. Update `src/styles/globals.css` when changing tokens; apply matching updates to both light and dark scopes.
 2. Validate typography and spacing choices against the shared scales and font pairing defined above.
 3. Review pages at multiple breakpoints to ensure mobile-responsiveness and flexible layouts.
 4. Confirm no shadows or gradients slipped into component overrides or Tailwind classes.

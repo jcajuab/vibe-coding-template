@@ -12,17 +12,5 @@
     "CSS": {
       "language_servers": ["tailwindcss"]
     }
-  },
-  "lsp": {
-    "vtsls": {
-      "settings": {
-        "typescript": {
-          "preferences": {
-            "autoImportFileExcludePatterns": ["lucide-react"],
-            "importModuleSpecifier": "non-relative"
-          }
-        }
-      }
-    }
   }
 }
